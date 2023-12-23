@@ -6,14 +6,18 @@ import com.vti.vtiacademy.modal.entity.ClassEntity;
 import com.vti.vtiacademy.service.IAccountService;
 import com.vti.vtiacademy.service.impl.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/account")
 @CrossOrigin("*")
+@Validated
 public class AccountController {
     @Autowired
     private IAccountService accountService;
@@ -44,7 +48,7 @@ public class AccountController {
     }
 
     @PostMapping("/create")
-    public Account create(@RequestBody AccountCreateReq request){
+    public Account create(@RequestBody @Valid AccountCreateReq request){
         return  accountService.create(request);
     }
 

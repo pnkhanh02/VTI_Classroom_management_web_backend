@@ -1,5 +1,7 @@
 package com.vti.vtiacademy.service.impl;
 
+import com.vti.vtiacademy.exception.CustomException;
+import com.vti.vtiacademy.exception.ErrorResponseEnum;
 import com.vti.vtiacademy.modal.dto.AccountCreateReq;
 import com.vti.vtiacademy.modal.dto.AccountSearchRequest;
 import com.vti.vtiacademy.modal.dto.AccountUpdateReq;
@@ -17,12 +19,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @Service
-public class AccountService implements IAccountService {
+public class AccountService implements IAccountService, UserDetailsService {
     @Autowired
     private AccountRepository accountRepository;
 
@@ -60,8 +72,24 @@ public class AccountService implements IAccountService {
 
     @Override
     public Account create(AccountCreateReq request) {
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        //Kiểm tra tất cả các dữ liệu đầu vào
+        //Nếu không thỏa mãn -> throw ra lỗi
+        String regex = "^[a-zA-Z0-9]*$";
+        boolean checkedUserName = request.getUsername().matches(regex);
+        if(!checkedUserName){
+            throw new CustomException(ErrorResponseEnum.USERNAME_EXISTED);
+        }
+
+
+        if(accountRepository.existsByUsername(request.getUsername())){
+            throw new CustomException(ErrorResponseEnum.USERNAME_EXISTED);
+        }
+
         Account account = new Account();
         BeanUtils.copyProperties(request, account);
+        //Set lại mật khẩu đã được mã hóa
+        account.setPassword(passwordEncoder.encode(request.getPassword()));
         //Kiểm tra Account có role là STUDENT ko, nếu không phải STUDENT -> kiểm tra có truyền classEntityId -> bắn lỗi
         //nếu có -> sẽ tìm ra đối tượng ClassEntity theo classEntityId từ request
         if(account.getRole() != Role.STUDENT){
@@ -94,5 +122,20 @@ public class AccountService implements IAccountService {
             }
         }
         return accountRepository.save(account);
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        Optional<Account> accountOptional = accountRepository.findByUsername(username);
+        if(accountOptional.isPresent()){
+            List<GrantedAuthority> authorities = new ArrayList<>();
+//            GrantedAuthority grantedAuthority = new SimpleGrantedAuthority(accountOptional.get().getRole().toString());
+
+            authorities.add(accountOptional.get().getRole());
+            return new User(username, accountOptional.get().getPassword(), authorities);
+        }else{
+            throw new UsernameNotFoundException(username);
+        }
+
     }
 }

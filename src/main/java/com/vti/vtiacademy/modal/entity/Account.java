@@ -33,6 +33,10 @@ public class Account {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    @Column(name = "status")
+    @Enumerated(EnumType.STRING)
+    private Status status;
+
     @Column(name = "phone_number", nullable = false, unique = true, length = 12)
     private String phoneNumber;
 
