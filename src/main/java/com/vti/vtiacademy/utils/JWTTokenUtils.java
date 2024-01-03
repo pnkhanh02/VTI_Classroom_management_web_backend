@@ -20,7 +20,7 @@ import java.util.Date;
 @Slf4j
 @Component
 public class JWTTokenUtils {
-    private static final long EXPIRATION_TIME = 3000000; // 10 days, thời hạn của token (test: 3000s)
+    private static final long EXPIRATION_TIME = 30000000; // 10 days, thời hạn của token (test: 3000s)
     private static final String SECRET = "123456"; // Chữ ký bí mật
     private static final String PREFIX_TOKEN = "Bearer"; // Ký tự đầu của token
     private static final String AUTHORIZATION = "Authorization"; // Key của token trên header

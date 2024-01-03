@@ -8,5 +8,5 @@ import java.time.LocalDate;
 
 @Data
 public class AccountSearchRequest extends SearchBase{
-    private String name;
+    private String username;
 }

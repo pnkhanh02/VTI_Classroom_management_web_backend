@@ -37,7 +37,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         //Lấy thông tin API hiện tại để kiểm tra API này có public hay không. Nếu được public -> không cần check token
         String request = httpServletRequest.getRequestURI();
         if (StringUtils.containsAnyIgnoreCase(request, "/api/v1/auth/")
-                || StringUtils.containsAnyIgnoreCase(request, "/api/v1/account/create")
                 || StringUtils.containsAnyIgnoreCase(request, "/api/v1/product/search")
                 || StringUtils.containsAnyIgnoreCase(request, "/swagger-ui")
                 || StringUtils.containsAnyIgnoreCase(request, "/swagger-resources")

@@ -13,10 +13,10 @@ public class AccountSpecification {
     }
 
     public static Specification<Account> findByUsername(AccountSearchRequest request){
-        if (!Utils.isBlank(request.getName())){
+        if (!Utils.isBlank(request.getUsername())){
             // Tạo điều kiện tìm kiếm với name
             return (root, query, cri) -> {
-                return cri.like(root.get("username"), "%" + request.getName() + "%");
+                return cri.like(root.get("username"), "%" + request.getUsername() + "%");
             };
         } else {
             return null;
@@ -24,10 +24,10 @@ public class AccountSpecification {
     }
 
     public static Specification<Account> findByEmail(AccountSearchRequest request){
-        if (!Utils.isBlank(request.getName())){
+        if (!Utils.isBlank(request.getUsername())){
             // Tạo điều kiện tìm kiếm với name
             return (root, query, cri) -> {
-                return cri.like(root.get("email"), "%" + request.getName() + "%");
+                return cri.like(root.get("email"), "%" + request.getUsername() + "%");
             };
         } else {
             return null;
@@ -35,10 +35,10 @@ public class AccountSpecification {
     }
 
     public static Specification<Account> findByFullName(AccountSearchRequest request){
-        if (!Utils.isBlank(request.getName())){
+        if (!Utils.isBlank(request.getUsername())){
             // Tạo điều kiện tìm kiếm với name
             return (root, query, cri) -> {
-                return cri.like(root.get("fullName"), "%" + request.getName() + "%");
+                return cri.like(root.get("fullName"), "%" + request.getUsername() + "%");
             };
         } else {
             return null;

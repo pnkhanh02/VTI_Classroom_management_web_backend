@@ -14,6 +14,7 @@ import com.vti.vtiacademy.repository.specification.AccountSpecification;
 import com.vti.vtiacademy.repository.specification.ClassEntitySpecification;
 import com.vti.vtiacademy.service.IAccountService;
 import com.vti.vtiacademy.utils.Utils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -50,6 +51,11 @@ public class AccountService implements IAccountService, UserDetailsService {
     public List<Account> getAllMentor() {
         return accountRepository.findAllByRole(Role.MENTOR);
     }
+
+//    @Override
+//    public List<Account> getAllClass() {
+//        return classEntityRepository.findAllByZoom_Id();
+//    }
 
     @Override
     public Page<Account> search(AccountSearchRequest request) {
@@ -89,19 +95,31 @@ public class AccountService implements IAccountService, UserDetailsService {
         Account account = new Account();
         BeanUtils.copyProperties(request, account);
         //Set lại mật khẩu đã được mã hóa
-        account.setPassword(passwordEncoder.encode(request.getPassword()));
+        if(StringUtils.isEmpty(request.getPassword())){
+            account.setPassword(passwordEncoder.encode("123456"));
+        } else {
+            account.setPassword(passwordEncoder.encode(request.getPassword()));
+        }
+
+
         //Kiểm tra Account có role là STUDENT ko, nếu không phải STUDENT -> kiểm tra có truyền classEntityId -> bắn lỗi
         //nếu có -> sẽ tìm ra đối tượng ClassEntity theo classEntityId từ request
-        if(account.getRole() != Role.STUDENT){
+        if(account.getRole() == Role.STUDENT){
             //Kiểm tra classEntityId có giá trị hay không
             if(request.getClassEntityId() != null){
                 //Bắn ra lỗi
+                ClassEntity classEntity = classEntityRepository.findById(request.getClassEntityId()).get();
+                account.setClassEntity(classEntity);
             }
-        }else{
-            //Trường hợp Account là STUDENT
-            //-> Tìm đối tượng ClassEntity theo id truyền vào
-            classEntityRepository.findById(request.getClassEntityId());
         }
+//        else{
+//            //Trường hợp Account là STUDENT
+//            //-> Tìm đối tượng ClassEntity theo id truyền vào
+//            classEntityRepository.findById(request.getClassEntityId());
+//        }
+
+//        ClassEntity classEntity = classEntityRepository.findById(request.getClassEntityId()).get();
+//        account.setClassEntity(classEntity);
         return accountRepository.save(account);
     }
 
@@ -111,16 +129,21 @@ public class AccountService implements IAccountService, UserDetailsService {
         BeanUtils.copyProperties(request, account);
         //Kiểm tra Account có role là STUDENT ko, nếu không phải STUDENT -> kiểm tra có truyền classEntityId -> bắn lỗi
         //nếu có -> sẽ tìm ra đối tượng ClassEntity theo classEntityId từ request
-        if(account.getRole() != Role.STUDENT){
+        if(account.getRole() == Role.STUDENT){
             //Kiểm tra classEntityId có giá trị hay không
             if(request.getClassEntityId() != null){
                 //Bắn ra lỗi
-            }else{
-                //Trường hợp Account là STUDENT
-                //-> Tìm đối tượng ClassEntity theo id truyền vào
-                classEntityRepository.findById(request.getClassEntityId());
+                ClassEntity classEntity = classEntityRepository.findById(request.getClassEntityId()).get();
+                account.setClassEntity(classEntity);
             }
+//            else{
+//                //Trường hợp Account là STUDENT
+//                //-> Tìm đối tượng ClassEntity theo id truyền vào
+//                classEntityRepository.findById(request.getClassEntityId());
+//            }
         }
+//        ClassEntity classEntity = classEntityRepository.findById(request.getClassEntityId()).get();
+//        account.setClassEntity(classEntity);
         return accountRepository.save(account);
     }
 

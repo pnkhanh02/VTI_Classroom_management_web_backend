@@ -11,5 +11,4 @@ import java.util.List;
 @Repository
 public interface ClassEntityRepository extends JpaRepository<ClassEntity, Long>, JpaSpecificationExecutor<ClassEntity> {
     List<ClassEntity> findAllByZoom_Id(Long zoomId);
-
 }

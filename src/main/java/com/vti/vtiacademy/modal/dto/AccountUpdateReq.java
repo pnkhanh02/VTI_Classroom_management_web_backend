@@ -13,7 +13,7 @@ public class AccountUpdateReq {
     private String username;
     private LocalDate dateOfBirth;
     private String address;
-    private String password;
+//    private String password;
     private String fullName;
     private Role role;
     private String phoneNumber;
